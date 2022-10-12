@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.test1.mapper.BoardMapper">
+	
+	<!-- 전체 select -->
+	<select id="selectBoardList"
+		resultType="com.example.test1.model.Board">	
+		<![CDATA[
+			SELECT 
+				board_idx, title, hit_cnt, created_datetime
+			FROM
+				t_board
+			WHERE
+				deleted_yn = 'N'
+			ORDER BY board_idx DESC
+		]]>
+	</select>
+	
+	<!-- 삭제 -->
+	<delete id="deleteBoard" parameterType="hashmap">
+		DELETE FROM t_board
+		WHERE BOARD_IDX IN (
+		<foreach collection="list" item="item" separator=" , ">#{item.boardIdx}
+		</foreach>
+		)
+	</delete>
+	
+	<!-- 수정 -->
+	<update id="updateBoard" parameterType="hashmap">
+		UPDATE T_BOARD 
+		SET CREATOR_ID = #{userId} 
+		WHERE BOARD_IDX = #{boardIdx}
+	</update>
+
+	<!-- 삽입 -->
+	<insert id="insertBoard" parameterType="hashmap">
+		INSERT INTO t_board
+		(title, contents, hit_cnt, created_datetime, creator_id)
+		VALUES
+		(#{title}, #{content}, '0', NOW() ,'test')
+	</insert>
+	
+	<!-- 상세 select -->
+	<select id="selectGetBoard"
+		resultType="com.example.test1.model.Board">
+		SELECT board_idx,
+				title,
+				contents,
+				hit_cnt,
+				creator_id,
+				created_datetime
+		FROM t_board
+		WHERE board_idx = #{boardIdx}
+	</select>
+
+	<!-- 조회수 -->
+	<update id="updateCnt" parameterType="hashmap">
+		UPDATE t_board 
+		SET hit_cnt = hit_cnt + 1 
+		WHERE board_idx = #{boardIdx}
+	</update>
+</mapper>
